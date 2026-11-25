@@ -25,6 +25,10 @@ export class MantenimientoService {
     return this.subject.value;
   }
 
+  reload(): void {
+    this.subject.next(this.load());
+  }
+
   create(data: Omit<Mantenimiento, 'id' | 'sincronizado'>): Mantenimiento {
     const item: Mantenimiento = { ...data, id: this.generateId(), sincronizado: false };
     this.persist([item, ...this.subject.value]);

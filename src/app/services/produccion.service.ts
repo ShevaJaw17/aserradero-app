@@ -25,6 +25,10 @@ export class ProduccionService {
     return this.subject.value;
   }
 
+  reload(): void {
+    this.subject.next(this.load());
+  }
+
   create(data: Omit<Produccion, 'id' | 'sincronizado'>): Produccion {
     const item: Produccion = { ...data, id: this.generateId(), sincronizado: false };
     this.persist([item, ...this.subject.value]);

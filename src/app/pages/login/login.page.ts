@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  standalone: false,
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
+  standalone: false,
 })
 export class LoginPage {
   usuario = '';
@@ -25,12 +25,13 @@ export class LoginPage {
   login(): void {
     this.error = '';
     this.loading = true;
-    const ok = this.auth.login(this.usuario.trim(), this.password);
-    this.loading = false;
-    if (ok) {
-      this.router.navigateByUrl('/dashboard', { replaceUrl: true });
-    } else {
-      this.error = 'Usuario o contraseña incorrectos';
-    }
+    this.auth.loginAsync(this.usuario.trim(), this.password).subscribe((ok) => {
+      this.loading = false;
+      if (ok) {
+        this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+      } else {
+        this.error = 'Usuario o contraseña incorrectos';
+      }
+    });
   }
 }

@@ -41,6 +41,22 @@ npx cap open ios
 
 Los datos se guardan localmente (localStorage) para trabajo offline. El punto de integración con la nube está en `src/app/services/sync.service.ts` (`syncPending`) y en el método `sincronizar()` del Dashboard. Reemplaza la función de push por llamadas HTTP a tu backend (Firebase, Supabase, REST) y marca los registros sincronizados con `marcarSincronizados`.
 
+## Backend REST (nube)
+
+El backend está en el repositorio hermano `aserradero-backend` (Node.js + Express).
+
+```bash
+# En otra terminal
+cd ../aserradero-backend
+npm install
+npm start   # http://localhost:3000
+```
+
+Configura la URL del API en `src/environments/environment.ts` (`apiUrl`).
+En producción (`environment.prod.ts`) apunta a tu backend desplegado.
+
+La sincronización se dispara desde el botón de nube en el Dashboard (`CloudSyncService.syncAll`).
+
 ## Estructura
 
 ```

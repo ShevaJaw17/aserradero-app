@@ -26,6 +26,10 @@ export class TroncoService {
     return this.subject.value;
   }
 
+  reload(): void {
+    this.subject.next(this.load());
+  }
+
   getById(id: string): Tronco | undefined {
     return this.subject.value.find((t) => t.id === id);
   }

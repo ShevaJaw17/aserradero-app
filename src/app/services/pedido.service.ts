@@ -25,6 +25,10 @@ export class PedidoService {
     return this.subject.value;
   }
 
+  reload(): void {
+    this.subject.next(this.load());
+  }
+
   getById(id: string): Pedido | undefined {
     return this.subject.value.find((p) => p.id === id);
   }

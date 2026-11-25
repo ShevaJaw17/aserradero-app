@@ -25,6 +25,10 @@ export class FacturaService {
     return this.subject.value;
   }
 
+  reload(): void {
+    this.subject.next(this.load());
+  }
+
   create(data: Omit<Factura, 'id' | 'numero' | 'sincronizado'>): Factura {
     const factura: Factura = {
       ...data,
