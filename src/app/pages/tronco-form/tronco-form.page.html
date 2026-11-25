@@ -1,0 +1,54 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/troncos"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ id ? 'Editar' : 'Nuevo' }} tronco</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-label position="floating">Especie *</ion-label>
+      <ion-input [(ngModel)]="especie" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Diámetro (cm) *</ion-label>
+      <ion-input [(ngModel)]="diametroCm" type="number" (ionChange)="calcularVolumen()"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Longitud (m) *</ion-label>
+      <ion-input [(ngModel)]="longitudM" type="number" (ionChange)="calcularVolumen()"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Volumen (m³)</ion-label>
+      <ion-input [(ngModel)]="volumenM3" type="number"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Proveedor</ion-label>
+      <ion-input [(ngModel)]="proveedor" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Ubicación</ion-label>
+      <ion-input [(ngModel)]="ubicacion" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Estado</ion-label>
+      <ion-select [(ngModel)]="estado">
+        <ion-select-option value="en_patio">En patio</ion-select-option>
+        <ion-select-option value="en_proceso">En proceso</ion-select-option>
+        <ion-select-option value="procesado">Procesado</ion-select-option>
+        <ion-select-option value="vendido">Vendido</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Notas</ion-label>
+      <ion-textarea [(ngModel)]="notas" rows="3"></ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" (click)="guardar()" [disabled]="!especie || !diametroCm || !longitudM">
+    Guardar
+  </ion-button>
+</ion-content>

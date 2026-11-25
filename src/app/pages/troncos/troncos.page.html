@@ -1,0 +1,54 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Troncos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/tronco-form">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="filtro" (ionChange)="filtro=$any($event.detail.value)">
+      <ion-segment-button value="todos"><ion-label>Todos</ion-label></ion-segment-button>
+      <ion-segment-button value="en_patio"><ion-label>Patio</ion-label></ion-segment-button>
+      <ion-segment-button value="en_proceso"><ion-label>Proceso</ion-label></ion-segment-button>
+      <ion-segment-button value="procesado"><ion-label>Procesado</ion-label></ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    @for (t of lista; track t.id) {
+      <ion-item-sliding>
+        <ion-item>
+          <ion-label>
+            <h2>{{ t.especie }} <ion-badge [color]="estadoColor(t.estado)">{{ estadoLabel(t.estado) }}</ion-badge></h2>
+            <p>Ø {{ t.diametroCm }} cm · L {{ t.longitudM }} m · {{ t.volumenM3 }} m³</p>
+            <p class="ion-text-muted">{{ t.fechaIngreso | date:'dd/MM/yyyy' }} · {{ t.proveedor || 'Sin proveedor' }}</p>
+          </ion-label>
+          <ion-icon slot="end" name="chevron-forward" (click)="null"></ion-icon>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="primary" [routerLink]="['/tronco-form']" [queryParams]="{id: t.id}">
+            <ion-icon slot="icon-only" name="create"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="eliminar(t)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    } @empty {
+      <ion-item>
+        <ion-label class="ion-text-center">No hay troncos registrados</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button routerLink="/tronco-form">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

@@ -1,0 +1,37 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Iniciar sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="login-container">
+    <ion-icon name="business-outline" size="large" color="primary"></ion-icon>
+    <h2>Aserradero</h2>
+    <p>Sistema de gestión de planta</p>
+
+    <ion-list>
+      <ion-item>
+        <ion-label position="floating">Usuario</ion-label>
+        <ion-input [(ngModel)]="usuario" type="text" (keyup.enter)="login()"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Contraseña</ion-label>
+        <ion-input [(ngModel)]="password" type="password" (keyup.enter)="login()"></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-text color="danger" *ngIf="error">
+      <p class="ion-padding-start">{{ error }}</p>
+    </ion-text>
+
+    <ion-button expand="block" (click)="login()" [disabled]="loading" class="ion-margin-top">
+      <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+      <span *ngIf="!loading">Entrar</span>
+    </ion-button>
+
+    <ion-note class="ion-margin-top ion-text-center">
+      <p>Demo: operador/operador · jefe/jefe · admin/admin</p>
+    </ion-note>
+  </div>
+</ion-content>

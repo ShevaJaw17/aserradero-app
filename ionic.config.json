@@ -1,0 +1,7 @@
+{
+  "name": "aserradero-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

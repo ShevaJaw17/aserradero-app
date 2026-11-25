@@ -1,0 +1,57 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-back-button defaultHref="/produccion"></ion-back-button></ion-buttons>
+    <ion-title>{{ id ? 'Editar' : 'Nueva' }} producción</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-label>Tipo</ion-label>
+      <ion-select [(ngModel)]="tipo">
+        <ion-select-option value="tabla">Tabla</ion-select-option>
+        <ion-select-option value="viga">Viga</ion-select-option>
+        <ion-select-option value="vigueta">Vigueta</ion-select-option>
+        <ion-select-option value="liston">Listón</ion-select-option>
+        <ion-select-option value="otro">Otro</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Especie *</ion-label>
+      <ion-input [(ngModel)]="especie" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Espesor (cm) *</ion-label>
+      <ion-input [(ngModel)]="espesorCm" type="number" (ionChange)="calcularVolumen()"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Ancho (cm) *</ion-label>
+      <ion-input [(ngModel)]="anchoCm" type="number" (ionChange)="calcularVolumen()"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Largo (m) *</ion-label>
+      <ion-input [(ngModel)]="largoM" type="number" (ionChange)="calcularVolumen()"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Cantidad *</ion-label>
+      <ion-input [(ngModel)]="cantidad" type="number" (ionChange)="calcularVolumen()"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Volumen (m³)</ion-label>
+      <ion-input [(ngModel)]="volumenM3" type="number"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Operador</ion-label>
+      <ion-input [(ngModel)]="operador" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Turno</ion-label>
+      <ion-input [(ngModel)]="turno" type="text"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" (click)="guardar()" [disabled]="!especie || !espesorCm || !anchoCm || !largoM || !cantidad">
+    Guardar
+  </ion-button>
+</ion-content>

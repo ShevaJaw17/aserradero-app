@@ -1,0 +1,79 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-back-button defaultHref="/facturacion"></ion-back-button></ion-buttons>
+    <ion-title>Nueva factura</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-label position="floating">Cliente *</ion-label>
+      <ion-input [(ngModel)]="cliente" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Método de pago</ion-label>
+      <ion-input [(ngModel)]="metodoPago" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">IVA (%)</ion-label>
+      <ion-input [(ngModel)]="impuestoPct" type="number"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-card>
+    <ion-card-header><ion-card-title>Agregar ítem</ion-card-title></ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="floating">Descripción *</ion-label>
+        <ion-input [(ngModel)]="desc" type="text"></ion-input>
+      </ion-item>
+      <ion-row>
+        <ion-col size="6">
+          <ion-item>
+            <ion-label position="floating">Cantidad *</ion-label>
+            <ion-input [(ngModel)]="cant" type="number"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size="6">
+          <ion-item>
+            <ion-label position="floating">Precio unit. *</ion-label>
+            <ion-input [(ngModel)]="precio" type="number"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-button expand="block" (click)="agregarItem()" [disabled]="!desc || !cant || precio === null">
+        Agregar ítem
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-list>
+    <ion-list-header><ion-label>Ítems ({{ items.length }})</ion-label></ion-list-header>
+    @for (it of items; track $index) {
+      <ion-item>
+        <ion-label>
+          <h2>{{ it.descripcion }}</h2>
+          <p>Cant: {{ it.cantidad }} · {{ it.precioUnitario }} c/u · Subtotal: {{ it.subtotal | number:'1.2-2' }}</p>
+        </ion-label>
+        <ion-button slot="end" fill="clear" color="danger" (click)="quitarItem($index)">
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
+      </ion-item>
+    } @empty {
+      <ion-item><ion-label class="ion-text-center">Sin ítems</ion-label></ion-item>
+    }
+  </ion-list>
+
+  <ion-card>
+    <ion-card-content>
+      <p>Subtotal: {{ totales.subtotal | number:'1.2-2' }}</p>
+      <p>IVA: {{ totales.impuesto | number:'1.2-2' }}</p>
+      <h2>Total: {{ totales.total | number:'1.2-2' }}</h2>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" (click)="guardar()" [disabled]="!cliente || items.length === 0">
+    Guardar factura
+  </ion-button>
+</ion-content>

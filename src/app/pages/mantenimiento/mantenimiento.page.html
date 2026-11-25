@@ -1,0 +1,43 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Mantenimiento</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/mantenimiento-form"><ion-icon slot="icon-only" name="add"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    @for (m of lista; track m.id) {
+      <ion-item-sliding>
+        <ion-item>
+          <ion-label>
+            <h2>{{ m.maquina }} <ion-badge [color]="estadoColor(m.estado)">{{ m.estado }}</ion-badge></h2>
+            <p>{{ tipoLabel(m.tipo) }} · {{ m.descripcion }}</p>
+            <p>Costo: {{ m.costo | number:'1.2-2' }} · {{ m.fecha | date:'dd/MM/yyyy' }} · {{ m.responsable }}</p>
+            <p class="ion-text-muted" *ngIf="m.proximoServicio">Próximo: {{ m.proximoServicio | date:'dd/MM/yyyy' }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="primary" [routerLink]="['/mantenimiento-form']" [queryParams]="{id: m.id}">
+            <ion-icon slot="icon-only" name="create"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="success" (click)="cambiarEstado(m, 'completado')">
+            <ion-icon slot="icon-only" name="checkmark"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="eliminar(m)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    } @empty {
+      <ion-item><ion-label class="ion-text-center">Sin registros</ion-label></ion-item>
+    }
+  </ion-list>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button routerLink="/mantenimiento-form"><ion-icon name="add"></ion-icon></ion-fab-button>
+  </ion-fab>
+</ion-content>
