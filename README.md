@@ -11,13 +11,9 @@ Aplicación móvil híbrida (Android/iOS) para la gestión de un aserradero, con
 - **Facturación**: facturas con subtotal, IVA y total; estados de pago.
 - **Mantenimiento**: preventivo/correctivo por máquina, costos, próximo servicio.
 
-## Usuarios demo
+## Autenticación
 
-| Usuario   | Contraseña | Rol        |
-|-----------|------------|------------|
-| operador  | operador   | Operador   |
-| jefe      | jefe       | Jefe       |
-| admin     | admin      | Admin      |
+La autenticación se delega al backend (`POST /auth/login`). No existen usuarios demo locales. Los usuarios y roles se administran en el backend.
 
 ## Ejecutar en navegador
 

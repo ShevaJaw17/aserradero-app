@@ -10,10 +10,22 @@ import { Mantenimiento, EstadoMantenimiento } from '../../models/mantenimiento.m
   styleUrls: ['./mantenimiento.page.scss'],
 })
 export class MantenimientoPage {
+  pageSize = 50;
+  shown = 50;
+
   constructor(public svc: MantenimientoService, private alert: AlertController) {}
 
   get lista(): Mantenimiento[] {
-    return this.svc.getAll();
+    return this.svc.getAll().slice(0, this.shown);
+  }
+
+  get hasMore(): boolean {
+    return this.shown < this.svc.getAll().length;
+  }
+
+  loadMore(ev: any): void {
+    this.shown += this.pageSize;
+    ev.target.complete();
   }
 
   tipoLabel(t: string): string {

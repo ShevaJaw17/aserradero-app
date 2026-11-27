@@ -19,5 +19,7 @@ export interface Factura {
   total: number;
   estado: EstadoFactura;
   metodoPago?: string;
-  sincronizado: boolean;
+   sincronizado: boolean;
+   eliminado?: boolean;
+   updatedAt?: string;
 }

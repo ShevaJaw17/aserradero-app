@@ -25,7 +25,7 @@ export class LoginPage {
   login(): void {
     this.error = '';
     this.loading = true;
-    this.auth.loginAsync(this.usuario.trim(), this.password).subscribe((ok) => {
+    this.auth.login(this.usuario.trim(), this.password).subscribe((ok) => {
       this.loading = false;
       if (ok) {
         this.router.navigateByUrl('/dashboard', { replaceUrl: true });

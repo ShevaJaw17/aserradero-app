@@ -11,13 +11,26 @@ import { Pedido, EstadoPedido } from '../../models/pedido.model';
 })
 export class PedidosPage {
   filtro: EstadoPedido | 'todos' = 'todos';
+  pageSize = 50;
+  shown = 50;
 
   constructor(public svc: PedidoService, private alert: AlertController) {}
 
   get lista(): Pedido[] {
     const all = this.svc.getAll();
-    if (this.filtro === 'todos') return all;
-    return all.filter((p) => p.estado === this.filtro);
+    const filtered = this.filtro === 'todos' ? all : all.filter((p) => p.estado === this.filtro);
+    return filtered.slice(0, this.shown);
+  }
+
+  get hasMore(): boolean {
+    const all = this.svc.getAll();
+    const filtered = this.filtro === 'todos' ? all : all.filter((p) => p.estado === this.filtro);
+    return this.shown < filtered.length;
+  }
+
+  loadMore(ev: any): void {
+    this.shown += this.pageSize;
+    ev.target.complete();
   }
 
   estadoColor(e: EstadoPedido): string {

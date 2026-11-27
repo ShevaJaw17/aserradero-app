@@ -10,10 +10,22 @@ import { Factura, EstadoFactura } from '../../models/factura.model';
   styleUrls: ['./facturacion.page.scss'],
 })
 export class FacturacionPage {
+  pageSize = 50;
+  shown = 50;
+
   constructor(public svc: FacturaService, private alert: AlertController) {}
 
   get lista(): Factura[] {
-    return this.svc.getAll();
+    return this.svc.getAll().slice(0, this.shown);
+  }
+
+  get hasMore(): boolean {
+    return this.shown < this.svc.getAll().length;
+  }
+
+  loadMore(ev: any): void {
+    this.shown += this.pageSize;
+    ev.target.complete();
   }
 
   estadoColor(e: EstadoFactura): string {

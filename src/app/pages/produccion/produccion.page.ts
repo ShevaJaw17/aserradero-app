@@ -10,10 +10,22 @@ import { Produccion } from '../../models/produccion.model';
   styleUrls: ['./produccion.page.scss'],
 })
 export class ProduccionPage {
+  pageSize = 50;
+  shown = 50;
+
   constructor(public svc: ProduccionService, private alert: AlertController) {}
 
   get lista(): Produccion[] {
-    return this.svc.getAll();
+    return this.svc.getAll().slice(0, this.shown);
+  }
+
+  get hasMore(): boolean {
+    return this.shown < this.svc.getAll().length;
+  }
+
+  loadMore(ev: any): void {
+    this.shown += this.pageSize;
+    ev.target.complete();
   }
 
   tipoLabel(t: string): string {

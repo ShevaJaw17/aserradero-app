@@ -8,7 +8,7 @@
       </ion-header>
       <ion-content>
         <ion-list id="inbox-list">
-          @for (p of visiblePages; track p.url) {
+          @for (p of pagesFor(auth.user$ | async); track p.url) {
             <ion-menu-toggle auto-hide="false">
               <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
                 <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>

@@ -6,45 +6,48 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <ion-list>
-    <ion-item>
-      <ion-label position="floating">Máquina *</ion-label>
-      <ion-input [(ngModel)]="maquina" type="text"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label>Tipo</ion-label>
-      <ion-select [(ngModel)]="tipo">
-        <ion-select-option value="preventivo">Preventivo</ion-select-option>
-        <ion-select-option value="correctivo">Correctivo</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Descripción *</ion-label>
-      <ion-textarea [(ngModel)]="descripcion" rows="3"></ion-textarea>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Responsable</ion-label>
-      <ion-input [(ngModel)]="responsable" type="text"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Costo</ion-label>
-      <ion-input [(ngModel)]="costo" type="number"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Próximo servicio</ion-label>
-      <ion-input [(ngModel)]="proximoServicio" type="date"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label>Estado</ion-label>
-      <ion-select [(ngModel)]="estado">
-        <ion-select-option value="programado">Programado</ion-select-option>
-        <ion-select-option value="en_proceso">En proceso</ion-select-option>
-        <ion-select-option value="completado">Completado</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </ion-list>
-
-  <ion-button expand="block" (click)="guardar()" [disabled]="!maquina || !descripcion">
-    Guardar
-  </ion-button>
+  <form [formGroup]="form">
+    <ion-list>
+      <ion-item>
+        <ion-label position="floating">Máquina *</ion-label>
+        <ion-input formControlName="maquina" type="text"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Tipo</ion-label>
+        <ion-select formControlName="tipo">
+          <ion-select-option value="preventivo">Preventivo</ion-select-option>
+          <ion-select-option value="correctivo">Correctivo</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Fecha</ion-label>
+        <ion-input formControlName="fecha" type="text"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Descripción *</ion-label>
+        <ion-textarea formControlName="descripcion" rows="3"></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Responsable</ion-label>
+        <ion-input formControlName="responsable" type="text"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Costo</ion-label>
+        <ion-input formControlName="costo" type="number"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Próximo servicio</ion-label>
+        <ion-input formControlName="proximoServicio" type="text"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Estado</ion-label>
+        <ion-select formControlName="estado">
+          <ion-select-option value="programado">Programado</ion-select-option>
+          <ion-select-option value="en_proceso">En proceso</ion-select-option>
+          <ion-select-option value="completado">Completado</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+    <ion-button expand="block" (click)="guardar()" [disabled]="form.invalid">Guardar</ion-button>
+  </form>
 </ion-content>

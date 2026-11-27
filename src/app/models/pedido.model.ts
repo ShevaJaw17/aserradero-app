@@ -19,5 +19,7 @@ export interface Pedido {
   total: number;
   estado: EstadoPedido;
   notas?: string;
-  sincronizado: boolean;
+   sincronizado: boolean;
+   eliminado?: boolean;
+   updatedAt?: string;
 }

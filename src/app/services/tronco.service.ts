@@ -8,10 +8,12 @@ const KEY = 'troncos';
 
 @Injectable({ providedIn: 'root' })
 export class TroncoService {
-  private subject = new BehaviorSubject<Tronco[]>(this.load());
+  private subject = new BehaviorSubject<Tronco[]>(this.load().filter((t) => !t.eliminado));
   list$: Observable<Tronco[]> = this.subject.asObservable();
 
   constructor(private storage: StorageService, private sync: SyncService) {}
+
+  private now(): string { return new Date().toISOString(); }
 
   private load(): Tronco[] {
     return this.storage.get<Tronco[]>(KEY) || [];
@@ -19,15 +21,24 @@ export class TroncoService {
 
   private persist(list: Tronco[]): void {
     this.storage.set(KEY, list);
-    this.subject.next(list);
+    this.subject.next(list.filter((t) => !t.eliminado));
   }
 
   getAll(): Tronco[] {
     return this.subject.value;
   }
 
+  getAllRaw(): Tronco[] {
+    return this.load();
+  }
+
   reload(): void {
-    this.subject.next(this.load());
+    this.subject.next(this.load().filter((t) => !t.eliminado));
+  }
+
+  replaceAll(list: Tronco[]): void {
+    this.storage.set(KEY, list);
+    this.subject.next(list.filter((t) => !t.eliminado));
   }
 
   getById(id: string): Tronco | undefined {
@@ -39,20 +50,25 @@ export class TroncoService {
       ...data,
       id: this.generateId(),
       sincronizado: false,
+      eliminado: false,
+      updatedAt: this.now(),
     };
-    this.persist([tronco, ...this.subject.value]);
+    this.persist([tronco, ...this.load()]);
     return tronco;
   }
 
   update(id: string, changes: Partial<Tronco>): void {
-    const list = this.subject.value.map((t) =>
-      t.id === id ? { ...t, ...changes, sincronizado: false } : t
+    const list = this.load().map((t) =>
+      t.id === id ? { ...t, ...changes, sincronizado: false, updatedAt: this.now() } : t
     );
     this.persist(list);
   }
 
   remove(id: string): void {
-    this.persist(this.subject.value.filter((t) => t.id !== id));
+    const list = this.load().map((t) =>
+      t.id === id ? { ...t, eliminado: true, sincronizado: false, updatedAt: this.now() } : t
+    );
+    this.persist(list);
   }
 
   cambiarEstado(id: string, estado: EstadoTronco): void {
@@ -60,12 +76,13 @@ export class TroncoService {
   }
 
   pendientesSync(): Tronco[] {
-    return this.subject.value.filter((t) => !t.sincronizado);
+    return this.load().filter((t) => !t.sincronizado);
   }
 
   marcarSincronizados(ids: string[]): void {
     const set = new Set(ids);
-    this.persist(this.subject.value.map((t) => (set.has(t.id) ? { ...t, sincronizado: true } : t)));
+    const list = this.load().map((t) => (set.has(t.id) ? { ...t, sincronizado: true } : t));
+    this.persist(list);
   }
 
   volumenTotal(list: Tronco[] = this.subject.value): number {
@@ -73,6 +90,8 @@ export class TroncoService {
   }
 
   private generateId(): string {
-    return 'TR-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+    const c: any = (globalThis as any).crypto;
+    const uuid = c && typeof c.randomUUID === 'function' ? c.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    return 'TR-' + uuid;
   }
 }

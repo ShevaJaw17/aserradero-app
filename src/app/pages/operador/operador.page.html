@@ -1,0 +1,55 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Operador - Trabajos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <form [formGroup]="form">
+    <ion-list>
+      <ion-item>
+        <ion-label>Máquina</ion-label>
+        <ion-select formControlName="maquina">
+          <ion-select-option value="despuntador">Despuntador</ion-select-option>
+          <ion-select-option value="bicelador">Bicelador</ion-select-option>
+          <ion-select-option value="mesa_tacos">Mesa de tacos</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">{{ form.get('maquina')?.value === 'mesa_tacos' ? 'Cantidad de tacos' : 'Cantidad de reglas' }}</ion-label>
+        <ion-input formControlName="cantidadReglas" type="number"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="form.get('maquina')?.value !== 'mesa_tacos'">
+        <ion-label position="floating">Largo (cm)</ion-label>
+        <ion-input formControlName="largo" type="number"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="form.get('maquina')?.value !== 'mesa_tacos'">
+        <ion-label position="floating">Ancho (cm)</ion-label>
+        <ion-input formControlName="ancho" type="number"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="form.get('maquina')?.value !== 'mesa_tacos'">
+        <ion-label position="floating">Grosor (cm)</ion-label>
+        <ion-input formControlName="grosor" type="number"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Tipo de tarima</ion-label>
+        <ion-input formControlName="tipoTarima" type="text"></ion-input>
+      </ion-item>
+      <ion-item *ngIf="form.get('maquina')?.value === 'mesa_tacos'">
+        <ion-label position="floating">Dimensiones (mesa tacos)</ion-label>
+        <ion-input formControlName="dimensiones" type="text"></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-button expand="block" (click)="guardar()" [disabled]="form.invalid">Registrar</ion-button>
+  </form>
+
+  <ion-list>
+    <ion-item *ngFor="let t of trabajos">
+      <ion-label>
+        <h2>{{ t.maquina }} — {{ t.cantidadReglas }} reglas</h2>
+        <p>{{ t.largo }}x{{ t.ancho }}x{{ t.grosor }} cm · Tarima: {{ t.tipoTarima }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -11,5 +11,7 @@ export interface Mantenimiento {
   costo: number;
   proximoServicio?: string;
   estado: EstadoMantenimiento;
-  sincronizado: boolean;
+   sincronizado: boolean;
+   eliminado?: boolean;
+   updatedAt?: string;
 }

@@ -11,5 +11,7 @@ export interface Tronco {
   ubicacion?: string;
   estado: EstadoTronco;
   notas?: string;
-  sincronizado: boolean;
+   sincronizado: boolean;
+   eliminado?: boolean;
+   updatedAt?: string;
 }

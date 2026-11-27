@@ -36,6 +36,10 @@
     }
   </ion-list>
 
+  <ion-infinite-scroll [disabled]="!hasMore" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button routerLink="/factura-form"><ion-icon name="add"></ion-icon></ion-fab-button>
   </ion-fab>

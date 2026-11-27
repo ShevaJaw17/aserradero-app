@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProduccionService } from '../../services/produccion.service';
 import { AuthService } from '../../services/auth.service';
 import { Produccion, TipoProducto } from '../../models/produccion.model';
@@ -12,60 +13,79 @@ import { Produccion, TipoProducto } from '../../models/produccion.model';
 })
 export class ProduccionFormPage implements OnInit {
   id: string | null = null;
-  tipo: TipoProducto = 'tabla';
-  especie = '';
-  espesorCm: number | null = null;
-  anchoCm: number | null = null;
-  largoM: number | null = null;
-  cantidad: number | null = 1;
-  volumenM3: number | null = null;
-  operador = '';
-  turno = '';
-  fecha = new Date().toISOString();
-  troncoId = '';
+  form: FormGroup;
 
   constructor(
+    private fb: FormBuilder,
     private svc: ProduccionService,
     private auth: AuthService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) {
+    this.form = this.fb.group({
+      tipo: ['tabla' as TipoProducto, Validators.required],
+      especie: ['', Validators.required],
+      espesorCm: [null, [Validators.required, Validators.min(0.001)]],
+      anchoCm: [null, [Validators.required, Validators.min(0.001)]],
+      largoM: [null, [Validators.required, Validators.min(0.001)]],
+      cantidad: [1, [Validators.required, Validators.min(1)]],
+      volumenM3: [null],
+      operador: [''],
+      turno: [''],
+      fecha: [new Date().toISOString()],
+      troncoId: [''],
+    });
+  }
 
   ngOnInit(): void {
-    this.operador = this.auth.currentUser?.nombre || '';
+    this.form.patchValue({ operador: this.auth.currentUser?.nombre || '' });
     this.id = this.route.snapshot.queryParamMap.get('id');
     if (this.id) {
       const p = this.svc.getAll().find((x) => x.id === this.id);
       if (p) {
-        this.tipo = p.tipo; this.especie = p.especie; this.espesorCm = p.espesorCm;
-        this.anchoCm = p.anchoCm; this.largoM = p.largoM; this.cantidad = p.cantidad;
-        this.volumenM3 = p.volumenM3; this.operador = p.operador; this.turno = p.turno || '';
-        this.fecha = p.fecha; this.troncoId = p.troncoId || '';
+        this.form.patchValue({
+          tipo: p.tipo,
+          especie: p.especie,
+          espesorCm: p.espesorCm,
+          anchoCm: p.anchoCm,
+          largoM: p.largoM,
+          cantidad: p.cantidad,
+          volumenM3: p.volumenM3,
+          operador: p.operador,
+          turno: p.turno || '',
+          fecha: p.fecha,
+          troncoId: p.troncoId || '',
+        });
       }
     }
+    ['espesorCm', 'anchoCm', 'largoM', 'cantidad'].forEach((c) =>
+      this.form.get(c)?.valueChanges.subscribe(() => this.calcularVolumen())
+    );
   }
 
   calcularVolumen(): void {
-    if (this.espesorCm && this.anchoCm && this.largoM && this.cantidad) {
-      const v = (this.espesorCm / 100) * (this.anchoCm / 100) * this.largoM * this.cantidad;
-      this.volumenM3 = Math.round(v * 1000) / 1000;
+    const v = this.form.value;
+    if (v.espesorCm && v.anchoCm && v.largoM && v.cantidad) {
+      const vol = (v.espesorCm / 100) * (v.anchoCm / 100) * v.largoM * v.cantidad;
+      this.form.get('volumenM3')?.setValue(Math.round(vol * 1000) / 1000, { emitEvent: false });
     }
   }
 
   guardar(): void {
-    if (!this.especie || !this.espesorCm || !this.anchoCm || !this.largoM || !this.cantidad) return;
-    const data = {
-      fecha: this.fecha,
-      troncoId: this.troncoId || undefined,
-      tipo: this.tipo,
-      especie: this.especie,
-      espesorCm: this.espesorCm,
-      anchoCm: this.anchoCm,
-      largoM: this.largoM,
-      cantidad: this.cantidad,
-      volumenM3: this.volumenM3 || 0,
-      operador: this.operador,
-      turno: this.turno,
+    if (this.form.invalid) return;
+    const v = this.form.value;
+    const data: Omit<Produccion, 'id' | 'sincronizado'> = {
+      fecha: v.fecha,
+      troncoId: v.troncoId || undefined,
+      tipo: v.tipo,
+      especie: v.especie,
+      espesorCm: v.espesorCm,
+      anchoCm: v.anchoCm,
+      largoM: v.largoM,
+      cantidad: v.cantidad,
+      volumenM3: v.volumenM3 || 0,
+      operador: v.operador,
+      turno: v.turno,
     };
     if (this.id) this.svc.update(this.id, data);
     else this.svc.create(data);

@@ -1,82 +1,60 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-buttons slot="start"><ion-back-button defaultHref="/pedidos"></ion-back-button></ion-buttons>
-    <ion-title>Nuevo pedido</ion-title>
+    <ion-title>{{ id ? 'Editar' : 'Nuevo' }} pedido</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <ion-list>
-    <ion-item>
-      <ion-label position="floating">Cliente *</ion-label>
-      <ion-input [(ngModel)]="cliente" type="text"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Teléfono</ion-label>
-      <ion-input [(ngModel)]="telefono" type="tel"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Notas</ion-label>
-      <ion-textarea [(ngModel)]="notas" rows="2"></ion-textarea>
-    </ion-item>
-  </ion-list>
+  <form [formGroup]="form">
+    <ion-list>
+      <ion-item>
+        <ion-label position="floating">Cliente *</ion-label>
+        <ion-input formControlName="cliente" type="text"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Teléfono</ion-label>
+        <ion-input formControlName="telefono" type="text"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Notas</ion-label>
+        <ion-textarea formControlName="notas" rows="3"></ion-textarea>
+      </ion-item>
+    </ion-list>
 
-  <ion-card>
-    <ion-card-header><ion-card-title>Agregar ítem</ion-card-title></ion-card-header>
-    <ion-card-content>
+    <ion-list>
       <ion-item>
         <ion-label position="floating">Producto *</ion-label>
-        <ion-input [(ngModel)]="prodNombre" type="text"></ion-input>
+        <ion-input [(ngModel)]="prodNombre" [ngModelOptions]="{standalone:true}" type="text"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Dimensiones</ion-label>
-        <ion-input [(ngModel)]="prodDim" type="text" placeholder="ej. 2x4x3m"></ion-input>
+        <ion-input [(ngModel)]="prodDim" [ngModelOptions]="{standalone:true}" type="text"></ion-input>
       </ion-item>
-      <ion-row>
-        <ion-col size="6">
-          <ion-item>
-            <ion-label position="floating">Cantidad *</ion-label>
-            <ion-input [(ngModel)]="prodCantidad" type="number"></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col size="6">
-          <ion-item>
-            <ion-label position="floating">Precio unit. *</ion-label>
-            <ion-input [(ngModel)]="prodPrecio" type="number"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-      <ion-button expand="block" (click)="agregarItem()" [disabled]="!prodNombre || !prodCantidad || prodPrecio === null">
-        Agregar ítem
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
-
-  <ion-list>
-    <ion-list-header><ion-label>Ítems ({{ items.length }})</ion-label></ion-list-header>
-    @for (it of items; track $index) {
       <ion-item>
-        <ion-label>
-          <h2>{{ it.producto }}</h2>
-          <p>{{ it.dimensiones }} · Cant: {{ it.cantidad }} · {{ it.precioUnitario }} c/u</p>
-          <p><strong>Subtotal: {{ it.subtotal | number:'1.2-2' }}</strong></p>
-        </ion-label>
-        <ion-button slot="end" fill="clear" color="danger" (click)="quitarItem($index)">
-          <ion-icon name="trash"></ion-icon>
-        </ion-button>
+        <ion-label position="floating">Cantidad *</ion-label>
+        <ion-input [(ngModel)]="prodCantidad" [ngModelOptions]="{standalone:true}" type="number"></ion-input>
       </ion-item>
-    } @empty {
-      <ion-item><ion-label class="ion-text-center">Sin ítems</ion-label></ion-item>
-    }
-  </ion-list>
+      <ion-item>
+        <ion-label position="floating">Precio unitario *</ion-label>
+        <ion-input [(ngModel)]="prodPrecio" [ngModelOptions]="{standalone:true}" type="number"></ion-input>
+      </ion-item>
+      <ion-button expand="block" (click)="agregarItem()">Agregar ítem</ion-button>
+    </ion-list>
 
-  <ion-card>
-    <ion-card-content>
-      <h2>Total: {{ total | number:'1.2-2' }}</h2>
-    </ion-card-content>
-  </ion-card>
+    <ion-list>
+      <ion-item *ngFor="let it of items; let i = index">
+        <ion-label>
+          {{ it.producto }} {{ it.dimensiones }} — {{ it.cantidad }} x {{ it.precioUnitario }} = {{ it.subtotal }}
+        </ion-label>
+        <ion-button slot="end" color="danger" (click)="quitarItem(i)">Quitar</ion-button>
+      </ion-item>
+    </ion-list>
 
-  <ion-button expand="block" (click)="guardar()" [disabled]="!cliente || items.length === 0">
-    Guardar pedido
-  </ion-button>
+    <p>Total: {{ total }}</p>
+
+    <ion-button expand="block" (click)="guardar()" [disabled]="form.invalid || items.length === 0">
+      Guardar
+    </ion-button>
+  </form>
 </ion-content>

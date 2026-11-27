@@ -11,13 +11,26 @@ import { Tronco, EstadoTronco } from '../../models/tronco.model';
 })
 export class TroncosPage {
   filtro: EstadoTronco | 'todos' = 'todos';
+  pageSize = 50;
+  shown = 50;
 
   constructor(public svc: TroncoService, private alert: AlertController) {}
 
   get lista(): Tronco[] {
     const all = this.svc.getAll();
-    if (this.filtro === 'todos') return all;
-    return all.filter((t) => t.estado === this.filtro);
+    const filtered = this.filtro === 'todos' ? all : all.filter((t) => t.estado === this.filtro);
+    return filtered.slice(0, this.shown);
+  }
+
+  get hasMore(): boolean {
+    const all = this.svc.getAll();
+    const filtered = this.filtro === 'todos' ? all : all.filter((t) => t.estado === this.filtro);
+    return this.shown < filtered.length;
+  }
+
+  loadMore(ev: any): void {
+    this.shown += this.pageSize;
+    ev.target.complete();
   }
 
   estadoColor(e: EstadoTronco): string {

@@ -8,6 +8,7 @@ import { ProduccionService } from './produccion.service';
 import { PedidoService } from './pedido.service';
 import { FacturaService } from './factura.service';
 import { MantenimientoService } from './mantenimiento.service';
+import { ToastService } from './toast.service';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -20,7 +21,8 @@ export class CloudSyncService {
     private produccion: ProduccionService,
     private pedidos: PedidoService,
     private facturas: FacturaService,
-    private mantenimientos: MantenimientoService
+    private mantenimientos: MantenimientoService,
+    private toast: ToastService
   ) {}
 
   private headers(): HttpHeaders {
@@ -32,23 +34,44 @@ export class CloudSyncService {
     return `${environment.apiUrl}${path}`;
   }
 
+  private merge(local: any[], server: any[]): any[] {
+    const localMap = new Map(local.map((x) => [x.id, x]));
+    const merged: any[] = [];
+    const serverIds = new Set(server.map((x: any) => x.id));
+    for (const s of server) {
+      const l = localMap.get(s.id);
+      if (l && !l.sincronizado) {
+        const lu = l.updatedAt || '';
+        const su = (s as any).updatedAt || '';
+        if (lu > su) {
+          merged.push({ ...l });
+          continue;
+        }
+      }
+      merged.push({ ...s, sincronizado: true });
+    }
+    for (const l of local) {
+      if (!serverIds.has(l.id) && !l.sincronizado) {
+        merged.push({ ...l });
+      }
+    }
+    return merged;
+  }
+
   async syncAll(): Promise<{ ok: boolean; message: string }> {
     if (!this.auth.token) {
-      // intentar login con credenciales guardadas? si no, fallar
       return { ok: false, message: 'Sin sesion en la nube. Inicia sesion online.' };
     }
     try {
-      // 1. Push: enviar todos los registros locales
       const payload = {
-        troncos: this.troncos.getAll(),
-        produccion: this.produccion.getAll(),
-        pedidos: this.pedidos.getAll(),
-        facturas: this.facturas.getAll(),
-        mantenimientos: this.mantenimientos.getAll(),
+        troncos: this.troncos.pendientesSync(),
+        produccion: this.produccion.pendientesSync(),
+        pedidos: this.pedidos.pendientesSync(),
+        facturas: this.facturas.pendientesSync(),
+        mantenimientos: this.mantenimientos.pendientesSync(),
       };
       await firstValueFrom(this.http.post(this.url('/sync'), payload, { headers: this.headers() }));
 
-      // 2. Pull: obtener estado actual del servidor
       const [troncos, produccion, pedidos, facturas, mantenimientos] = await Promise.all([
         firstValueFrom(this.http.get<any[]>(this.url('/troncos'), { headers: this.headers() })),
         firstValueFrom(this.http.get<any[]>(this.url('/produccion'), { headers: this.headers() })),
@@ -57,22 +80,18 @@ export class CloudSyncService {
         firstValueFrom(this.http.get<any[]>(this.url('/mantenimientos'), { headers: this.headers() })),
       ]);
 
-      this.storage.set('troncos', troncos.map((t) => ({ ...t, sincronizado: true })));
-      this.storage.set('produccion', produccion.map((p) => ({ ...p, sincronizado: true })));
-      this.storage.set('pedidos', pedidos.map((p) => ({ ...p, sincronizado: true })));
-      this.storage.set('facturas', facturas.map((f) => ({ ...f, sincronizado: true })));
-      this.storage.set('mantenimientos', mantenimientos.map((m) => ({ ...m, sincronizado: true })));
-
-      this.troncos.reload();
-      this.produccion.reload();
-      this.pedidos.reload();
-      this.facturas.reload();
-      this.mantenimientos.reload();
+      this.troncos.replaceAll(this.merge(this.troncos.getAllRaw(), troncos));
+      this.produccion.replaceAll(this.merge(this.produccion.getAllRaw(), produccion));
+      this.pedidos.replaceAll(this.merge(this.pedidos.getAllRaw(), pedidos));
+      this.facturas.replaceAll(this.merge(this.facturas.getAllRaw(), facturas));
+      this.mantenimientos.replaceAll(this.merge(this.mantenimientos.getAllRaw(), mantenimientos));
 
       this.storage.set('last_sync', new Date().toISOString());
+      this.toast.success('Sincronización completada');
       return { ok: true, message: 'Sincronizacion completada' };
     } catch (e: any) {
       console.error('CloudSyncService.syncAll error', e);
+      this.toast.error(e?.message || 'Error al sincronizar');
       return { ok: false, message: e?.message || 'Error al sincronizar' };
     }
   }

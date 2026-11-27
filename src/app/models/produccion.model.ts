@@ -13,5 +13,7 @@ export interface Produccion {
   volumenM3: number;
   operador: string;
   turno?: string;
-  sincronizado: boolean;
+   sincronizado: boolean;
+   eliminado?: boolean;
+   updatedAt?: string;
 }
